@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Members</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('https://images.unsplash.com/photo-1512820790803-83ca734da794') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+
+    header {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      color: #ffffff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    footer {
+      background-color: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      text-align: center;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 100px auto 60px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #ffffff;
+      margin-bottom: 30px;
+    }
+
+    .member-list {
+      margin-bottom: 30px;
+    }
+
+    .member {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .add-member {
+      display: flex;
+      gap: 10px;
+    }
+
+    .add-member input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    .add-member button {
+      padding: 10px 16px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .add-member button:hover {
+      background: #218838;
+    }
+
+    .delete-button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    .delete-button:hover {
+      background-color: #c82333;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-warning {
+      background: #ffc107;
+      color: #000;
+    }
+
+    input::placeholder {
+      color: #666;
+    }
+
+
+  </style>
+</head>
+<body>
+
+<header>
+  Library Management - Members
+</header>
+<div style="text-align: center; margin-bottom: 2rem;">
+  <a href="/" style="text-decoration: none;">
+    <button style="
+      background-color: #000000;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    " onmouseover="this.style.backgroundColor='#ffffff';this.style.color='#000000'" onmouseout="this.style.backgroundColor='#000000';this.style.color='#ffffff'">
+      ⬅️  Home
+    </button>
+  </a>
+</div>
+
+<div class="container">
+  <h1>Manage Members</h1>
+
+  <div class="member-list" id="memberList">
+    <div th:each="client : ${clients}" class="member">
+      <span th:text="${client.name}">Client Name</span>
+      <form th:action="@{'/members/delete/' + ${client.id}}" method="post" style="margin: 0;">
+        <button type="submit" class="delete-button">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <form class="add-member" th:action="@{/members/add}" method="post">
+    <input type="text" th:field="${newClient.name}" placeholder="Enter member name" required />
+    <button type="submit">Add Member</button>
+  </form>
+</div>
+
+<footer>
+  &copy; 2025 My Library App. All rights reserved.
+</footer>
+
+<!-- Toasts -->
+<div class="toast" id="toast" th:if="${success == 'added'}">Member added successfully!</div>
+<div class="toast toast-warning" id="confirmToast" style="display: none;">Click again to confirm delete!</div>
+<div class="toast" id="deleteToast" th:if="${success == 'deleted'}">Member deleted successfully!</div>
+
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const toast = document.querySelector("#toast.show, #deleteToast.show");
+    if (toast) {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    } else {
+      document.querySelectorAll('.toast').forEach(t => {
+        if (t.innerText.trim()) {
+          t.classList.add('show');
+          setTimeout(() => t.classList.remove('show'), 3000);
+        }
+      });
+    }
+  });
+</script>
+
+</body>
+</html>

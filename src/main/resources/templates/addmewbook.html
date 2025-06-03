@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add New Book</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: url('https://images.unsplash.com/photo-1512820790803-83ca734da794') no-repeat center center fixed;
+      background-size: cover;
+      background-color: black;
+      color: white;
+    }
+
+    header, footer {
+      background-color: rgba(20, 20, 20, 0.95);
+      color: white;
+      text-align: center;
+      padding: 1rem 0;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    form {
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+
+    input, select {
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+
+    .upload-section {
+      margin-top: 1.5rem;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.85);
+      padding: 1.5rem;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 700px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+
+    .submit-section {
+      margin: 2rem auto;
+      text-align: center;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 4px;
+      display: none;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Library Management System</h1>
+</header>
+<div style="text-align: center; margin-bottom: 2rem;">
+  <a href="/" style="text-decoration: none;">
+    <button style="
+      background-color: #000000;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    " onmouseover="this.style.backgroundColor='#ffffff';this.style.color='#000000'" onmouseout="this.style.backgroundColor='#000000';this.style.color='#ffffff'">
+      ⬅️  Home
+    </button>
+  </a>
+</div>
+
+<div class="container">
+  <form th:action="@{/books/addmewbook}" method="post" enctype="multipart/form-data">
+    <h2>Ajouter un nouveau livre</h2>
+
+    <div class="form-group">
+      <div>
+        <label>Title</label>
+        <input type="text" name="title" required>
+      </div>
+      <div>
+        <label>Serial number</label>
+        <input type="text" name="isbn" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div>
+        <label>Publication Year</label>
+        <input type="number" name="publicationYear" required>
+      </div>
+      <div>
+        <label>Category</label>
+        <select name="categorieId" required>
+          <option value="">-- Select Category --</option>
+          <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div>
+        <label>Author</label>
+        <select name="authorId" required>
+          <option value="">-- Select Author --</option>
+          <option th:each="auth : ${authors}" th:value="${auth.id}" th:text="${auth.name}"></option>
+        </select>
+      </div>
+      <div></div>
+    </div>
+
+    <div class="upload-section">
+      <label><strong>Upload Book Image</strong></label><br>
+      <input type="file" name="image" accept="image/*">
+    </div>
+
+    <div class="submit-section">
+      <button type="submit">Save</button>
+    </div>
+  </form>
+</div>
+
+<footer>
+  <p>&copy; 2025 Library System</p>
+</footer>
+
+<div class="toast" th:if="${success}">Book added successfully!</div>
+
+</body>
+</html>

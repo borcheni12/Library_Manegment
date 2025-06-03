@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Books</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: url('https://images.unsplash.com/photo-1512820790803-83ca734da794') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      backdrop-filter: blur(6px);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeIn 1s ease;
+    }
+
+    .book-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+      animation: fadeIn 1.5s ease;
+    }
+
+    .book-card {
+      background-color: rgba(0, 0, 0, 0.75);
+      padding: 1.2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .book-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 18px rgba(255,255,255,0.2);
+    }
+
+    .book-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .book-author {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+
+    .book-description {
+      font-size: 0.95rem;
+      line-height: 1.4;
+      opacity: 0.85;
+    }
+
+    .book-image {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .book-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    .action-btn {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 50%;
+      padding: 0.6rem;
+      font-size: 1.2rem;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.2);
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background-color: #222;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      color: white;
+    }
+
+    .modal h2 {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .modal form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .modal input, .modal textarea {
+      background-color: #333;
+      color: white;
+      border: 1px solid #555;
+      padding: 0.5rem;
+      border-radius: 4px;
+      resize: none;
+    }
+
+    .modal img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 1rem;
+      border-radius: 6px;
+    }
+
+    .modal-buttons {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    .modal-buttons button {
+      padding: 0.6rem 1.5rem;
+      background-color: #555;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .modal-buttons button:hover {
+      background-color: #777;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<h1>Available Books</h1>
+<div style="text-align: center; margin-bottom: 2rem;">
+  <a href="/" style="text-decoration: none;">
+    <button style="
+      background-color: #000000;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    " onmouseover="this.style.backgroundColor='#ffffff';this.style.color='#000000'" onmouseout="this.style.backgroundColor='#000000';this.style.color='#ffffff'">
+      ⬅️  Home
+    </button>
+  </a>
+</div>
+
+<div class="book-grid" id="bookGrid"></div>
+
+<!-- View Book Modal -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal">
+    <h2>Book Details</h2>
+    <form>
+      <input type="text" id="viewTitle" readonly placeholder="Title">
+      <input type="text" id="viewAuthor" readonly placeholder="Author">
+      <input type="text" id="viewCategory" readonly placeholder="Category">
+      <textarea id="viewDescription" rows="4" readonly placeholder="Description"></textarea>
+      <img id="viewImage" src="" alt="Book Cover">
+    </form>
+    <div class="modal-buttons">
+      <button onclick="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function viewBook(book) {
+    document.getElementById("viewTitle").value = book.title || "";
+    document.getElementById("viewAuthor").value = book.authorName || "";
+    document.getElementById("viewCategory").value = book.categorieName || "";
+    document.getElementById("viewDescription").value = book.description || "";
+    document.getElementById("viewImage").src = book.imagePath ? '/' + book.imagePath.replace(/\\/g, '/') : 'https://via.placeholder.com/250x350?text=No+Image';
+    document.getElementById("viewModal").style.display = "flex";
+  }
+
+  function closeViewModal() {
+    document.getElementById("viewModal").style.display = "none";
+  }
+
+  async function loadBooks() {
+    try {
+      const res = await fetch("/api/books");
+      const books = await res.json();
+      const grid = document.getElementById("bookGrid");
+
+      books.forEach(book => {
+        const card = document.createElement("div");
+        card.className = "book-card";
+
+        const imageUrl = book.imagePath
+        ? (book.imagePath.startsWith("/") ? book.imagePath
+        : "/" + book.imagePath.replace(/\\/g, '/'))
+        : 'https://via.placeholder.com/250x350?text=No+Image';
+
+
+
+        card.innerHTML = `
+          <img src="${imageUrl}" alt="${book.title}" class="book-image" />
+          <div class="book-title">${book.title || 'Untitled Book'}</div>
+          <div class="book-author">By ${book.authorName || 'Unknown Author'}</div>
+          <div class="book-description">Category: ${book.categorieName || 'Uncategorized'}</div>
+          <div class="book-actions">
+            <button class="action-btn" onclick='viewBook(${JSON.stringify(book)})' title="View">&#128065;</button>
+            <button class="action-btn" onclick="alert('Implement delete logic')" title="Delete">&#128465;</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+    } catch (err) {
+      console.error("Failed to load books:", err);
+    }
+  }
+
+  loadBooks();
+</script>
+</body>
+</html>
